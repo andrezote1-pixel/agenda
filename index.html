@@ -222,14 +222,15 @@ function autoRisca(){const agora=Date.now();let n=0;
   if(n){save();sync()}}
 
 function itensDo(data){return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99')||(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.ord||0)-(b.ord||0))}
-function avisoTxt(i){return i.hora?'00h · 1h e 30 min antes':'00h'}
+const AULA=i=>i.cat==='fasec'||i.cat==='ifto';
+function avisoTxt(i){return AULA(i)?'':i.hora?'00h · 1h e 30 min antes':'00h'}
 function itemHTML(i){
   const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim)+(i.fim<=i.hora?' (dia seguinte)':''):''):'';
   const auto=i.feito&&f&&Date.now()>=f;
   return `<div class="it glass${i.feito?' done':''}" style="--cc:var(--c-${i.cat})">
   <button class="ck" data-ck="${i.id}" aria-label="Marcar como feito">${i.feito?'✓':''}</button>
   <div class="tx" data-ed="${i.id}"><div class="ti">${esc(i.titulo)}</div>
-  <div class="me"><span class="tag">${CATS[i.cat]||'Outro'}</span>${hr?`<span>🕒 ${hr}</span>`:''}${i.feito?(auto?'<span class="auto">encerrado</span>':''):`<span>🔔 ${avisoTxt(i)}</span>`}${i.nota?`<span>📎 ${esc(i.nota)}</span>`:''}</div></div></div>`}
+  <div class="me"><span class="tag">${CATS[i.cat]||'Outro'}</span>${hr?`<span>🕒 ${hr}</span>`:''}${i.feito?(auto?'<span class="auto">encerrado</span>':''):(avisoTxt(i)?`<span>🔔 ${avisoTxt(i)}</span>`:'')}${i.nota?`<span>📎 ${esc(i.nota)}</span>`:''}</div></div></div>`}
 
 function render(){autoRisca();document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===S.view));S.view==='mes'?renderMes():renderDia()}
 function renderDia(){
@@ -273,9 +274,9 @@ document.addEventListener('click',e=>{
 function touch(i){i.upd=Date.now();i._dirty=1;save();render();sync()}
 
 // editor
-$('#fCat').innerHTML=Object.entries(CATS).filter(([k])=>k!=='fasec'&&k!=='ifto').map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-const notaAv=()=>{$('#fAvNote').textContent=$('#fHora').value?'Avisos: 00h do dia, 1h antes e 30 min antes. Some da lista sozinho quando terminar.':'Aviso às 00h do dia. Fica o dia todo até você riscar.'};
-$('#fHora').oninput=notaAv;
+$('#fCat').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+const notaAv=()=>{$('#fAvNote').textContent=/fasec|ifto/.test($('#fCat').value)?'Aula: aparece na agenda, sem aviso.':$('#fHora').value?'Avisos: 00h do dia, 1h antes e 30 min antes. Some da lista sozinho quando terminar.':'Aviso às 00h do dia. Fica o dia todo até você riscar.'};
+$('#fHora').oninput=notaAv;$('#fCat').onchange=notaAv;
 const PADRAO=[[/helena dorme/i,'19:00','12:00'],[/buscar helena/i,'14:00','18:00'],[/pagar fomento|relat[óo]rio da uab|pens[ãa]o/i,'12:00','13:00']];
 $('#fTit').addEventListener('change',()=>{if($('#fHora').value)return;const p=PADRAO.find(([r])=>r.test($('#fTit').value));if(p){$('#fHora').value=p[1];$('#fFim').value=p[2];if(/helena/i.test($('#fTit').value))$('#fCat').value='helena';notaAv()}});
 function abrir(i){editing=i||null;$('#edT').textContent=i?'Editar':'Novo compromisso';
