@@ -80,6 +80,7 @@ main{max-width:1200px;margin:0 auto;padding:8px 16px calc(env(safe-area-inset-bo
 .wd{text-align:center;font-size:13px;font-weight:700;color:var(--mut);padding:4px 0}
 .cell{border-radius:16px;min-height:120px;padding:8px;text-align:left;display:flex;flex-direction:column;gap:4px;overflow:hidden;cursor:pointer}
 .cell.out{visibility:hidden}
+.cell.prox{opacity:.45;filter:blur(.7px) saturate(.6);transition:opacity .2s,filter .2s}.cell.prox:hover{opacity:.8;filter:none}
 .cell .n{font-size:18px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .cell.today{background:linear-gradient(160deg,#fff6d3,var(--today));border:2px solid var(--todayb)}
 .cell.today .n::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--todayb)}
@@ -258,6 +259,12 @@ function renderMes(){
     g+=`<div class="cell glass${ds===th?' today':''}${fer?' fer':''}" data-dia="${ds}"><div class="n">${d}</div>
     ${vis.map(i=>`<div class="ch${i.feito?' d':''}" style="--cc:var(--c-${i.cat})">${i.hora?hh(i.hora)+' ':''}${esc(curto(i.titulo,ph))}</div>`).join('')}${resto>0?`<div class="more">+${resto}</div>`:''}</div>`;
     if(its.length){const dt=parse(ds);lst+=`<div class="dayh"><button data-dia="${ds}">${DIAS[dt.getDay()]}, ${d}</button><span class="c">${its.filter(i=>i.feito).length}/${its.length} feitos</span></div><div class="list">${its.map(itemHTML).join('')}</div>`}}
+  // completa a última semana com os primeiros dias do mês seguinte, meio apagados
+  const sobra=6-(new Date(y,m,0).getDay()+6)%7;
+  for(let k=1;k<=sobra;k++){const dn=new Date(y,m,k),ds=iso(dn),its=itensDo(ds);
+    const vis=its.slice(0,its.length>lim?lim-1:lim),resto=its.length-vis.length;
+    g+=`<div class="cell glass prox" data-dia="${ds}"><div class="n">${k}</div>
+    ${vis.map(i=>`<div class="ch${i.feito?' d':''}" style="--cc:var(--c-${i.cat})">${i.hora?hh(i.hora)+' ':''}${esc(curto(i.titulo,ph))}</div>`).join('')}${resto>0?`<div class="more">+${resto}</div>`:''}</div>`}
   g+='</div>';
   const este=mes===th.slice(0,7),primeiro=mes<=ct.slice(0,7);
   $('#main').innerHTML=`<div class="nav mnav"><div class="mpill glass"><button class="nb" data-gm="-1" aria-label="Mês anterior"${primeiro?' disabled':''}>${seta(-1)}</button>
