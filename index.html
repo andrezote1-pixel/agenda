@@ -343,7 +343,12 @@ setInterval(()=>{const h=hoje();if(h!==ultHoje){if(cur===ultHoje)cur=h;ultHoje=h
 setInterval(()=>sync(),5*60*1000);
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)}
 addEventListener('resize',()=>{if(S.view==='mes')render()});
-if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol!=='file:'){
+  // versão nova publicada: atualiza sozinho
+  const tinha=!!navigator.serviceWorker.controller;let recarregou=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(tinha&&!recarregou){recarregou=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()});setInterval(()=>r.update(),30*60*1000)}).catch(()=>{});
+}
 render();guia();sync();
 </script>
 </body>
