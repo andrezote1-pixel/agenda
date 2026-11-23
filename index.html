@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agenda</title>
+<meta name="theme-color" content="#1B2A5E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agenda">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --navy:#1B2A5E;--gold:#F2B705;--bg:#F4F5F8;--card:#FFFFFF;--ink:#1D2230;--mut:#6B7285;--line:#E3E6EE;--hi:#FFF7DB;
+  --c-contas:#C98A00;--c-relatorio:#B5651D;--c-helena:#D6478A;--c-feriado:#C0392B;--c-aniversario:#8B0000;
+  --c-pessoal:#2F6FDB;--c-ifto:#2F9E41;--c-fasec:#1A8BBD;--c-doutorado:#7A5AC8;--c-outro:#6B7285;
+}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1320;--card:#181D2C;--ink:#E9ECF4;--mut:#9AA2B8;--line:#2A3045;--hi:#2B2716}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Carlito,sans-serif}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px}
+.top{display:flex;align-items:center;gap:8px;max-width:1100px;margin:0 auto}
+.top h1{font-size:17px;margin:0;flex:1;letter-spacing:.2px}.top h1 b{color:var(--gold)}
+.sync{font-size:11px;opacity:.85;display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:#9AA2B8}.dot.ok{background:#4ADE80}.dot.pend{background:var(--gold)}
+.ib{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px}
+.ib:active{background:rgba(255,255,255,.15)}
+main{max-width:1100px;margin:0 auto;padding:12px 16px calc(env(safe-area-inset-bottom) + 92px)}
+.nav{display:flex;align-items:center;gap:6px;margin:4px 0 12px}
+.nav .t{flex:1;font-weight:700;font-size:19px;text-transform:capitalize}
+.nav .sub{font-weight:400;font-size:13px;color:var(--mut);text-transform:none}
+.nb{width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:18px}
+.pill{padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600}
+.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:-4px 0 14px}.prog i{display:block;height:100%;background:var(--ifto,#2F9E41);background:#2F9E41}
+.list{display:flex;flex-direction:column;gap:8px}
+.it{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--cc);border-radius:12px;padding:11px 12px}
+.ck{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--cc);display:grid;place-items:center;font-size:16px;font-weight:800;color:#fff;margin-top:-1px}
+.it.done .ck{background:var(--cc)}
+.it .tx{flex:1;min-width:0}
+.it .ti{font-weight:600;word-wrap:break-word}
+.it.done .ti{text-decoration:line-through;color:var(--mut);font-weight:500}
+.it .me{font-size:12px;color:var(--mut);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.it .me .tag{color:var(--cc);font-weight:700}
+.empty{text-align:center;color:var(--mut);padding:36px 10px;background:var(--card);border:1px dashed var(--line);border-radius:12px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
+.wd{text-align:center;font-size:11px;font-weight:700;color:var(--mut);padding:2px 0}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:9px;min-height:52px;padding:4px;text-align:left;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cell.out{visibility:hidden}
+.cell .n{font-size:12px;font-weight:700}
+.cell.today{outline:2px solid var(--gold);outline-offset:-2px;background:var(--hi)}
+.cell.fer .n{color:var(--c-feriado)}
+.dots{display:flex;flex-wrap:wrap;gap:3px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--cc)}.dots i.d{opacity:.3}
+.mt{display:none;font-size:10.5px;line-height:1.25;border-left:3px solid var(--cc);padding-left:4px}
+.mt.d{text-decoration:line-through;color:var(--mut)}
+.dayh{display:flex;align-items:baseline;gap:8px;margin:16px 0 6px;font-weight:700}
+.dayh button{font-weight:700;text-transform:capitalize}.dayh .c{font-weight:400;font-size:12px;color:var(--mut)}
+.dayh.today button{color:var(--c-contas)}
+@media (min-width:820px){
+  .cell{min-height:118px}.dots{display:none}.mt{display:block}.mlist{display:none}
+}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:8px 12px calc(env(safe-area-inset-bottom) + 8px)}
+.tab{flex:0 1 140px;padding:9px;border-radius:12px;font-weight:700;color:var(--mut)}
+.tab.on{background:var(--navy);color:#fff}
+.fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 76px);z-index:7;width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:32px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.sh{position:fixed;inset:0;z-index:20;background:rgba(10,14,25,.45);display:none;align-items:flex-end;justify-content:center}
+.sh.on{display:flex}
+.pane{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:92vh;overflow:auto}
+@media (min-width:700px){.sh{align-items:center}.pane{border-radius:18px}}
+.pane h2{margin:0 0 12px;font-size:18px}
+label{display:block;font-size:12px;font-weight:700;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.btns{display:flex;gap:10px;margin-top:16px}
+.b{flex:1;padding:12px;border-radius:12px;font-weight:700;background:var(--bg);border:1px solid var(--line)}
+.b.p{background:var(--navy);color:#fff;border-color:var(--navy)}.b.x{color:var(--c-feriado)}
+.note{font-size:12px;color:var(--mut);margin-top:6px}
+.copy{display:flex;gap:6px}.copy input{font-size:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 150px);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:.95}
+</style>
+</head>
+<body>
+<header><div class="top">
+  <h1><b>★</b> Agenda</h1>
+  <div class="sync" id="sync"><span class="dot" id="sdot"></span><span id="stx">no aparelho</span></div>
+  <button class="ib" id="bsync" title="Sincronizar" aria-label="Sincronizar">⟳</button>
+  <button class="ib" id="bcfg" title="Configurações" aria-label="Configurações">⚙︎</button>
+</div></header>
+<main id="main"></main>
+<button class="fab" id="fab" aria-label="Incluir">+</button>
+<nav class="tabs"><button class="tab on" data-v="dia">Hoje</button><button class="tab" data-v="mes">Mês</button></nav>
+
+<div class="sh" id="shEd"><div class="pane">
+  <h2 id="edT">Novo compromisso</h2>
+  <label>O que é</label><input id="fTit" placeholder="Ex.: Pagar a internet">
+  <div class="row"><div><label>Dia</label><input id="fData" type="date"></div><div><label>Hora (opcional)</label><input id="fHora" type="time"></div></div>
+  <div class="row"><div><label>Tipo</label><select id="fCat"></select></div><div><label>Aviso no calendário</label><select id="fAv">
+    <option value="">Sem aviso</option><option value="manha">Às 7h do dia</option><option value="vespera">Às 20h da véspera</option>
+    <option value="m60">1 hora antes</option><option value="m15">15 min antes</option><option value="h0">Na hora</option></select></div></div>
+  <div id="repBox"><div class="row"><div><label>Repetir</label><select id="fRep"><option value="">Não repete</option><option value="w">Toda semana</option><option value="m">Todo mês</option></select></div>
+  <div><label>Até</label><input id="fAte" type="date"></div></div></div>
+  <label>Observação</label><textarea id="fNota"></textarea>
+  <div class="btns"><button class="b x" id="edDel">Excluir</button><button class="b" id="edCan">Cancelar</button><button class="b p" id="edOk">Salvar</button></div>
+</div></div>
+
+<div class="sh" id="shCfg"><div class="pane">
+  <h2>Configurações</h2>
+  <label>Link de sincronização (do Apps Script)</label>
+  <input id="cUrl" placeholder="https://script.google.com/macros/s/…/exec?t=…">
+  <div class="note">Cole o mesmo link no iPhone, no iPad e no computador. Sem ele o app funciona só neste aparelho.</div>
+  <label>Link do calendário (para os avisos)</label>
+  <div class="copy"><input id="cIcs" readonly><button class="b" id="cCopy" style="flex:none">Copiar</button></div>
+  <div class="note">Assine este link no Calendário do iPhone/iPad e do computador. Os avisos tocam pelo Calendário, mesmo sem internet.</div>
+  <div class="btns"><button class="b" id="cExp">Baixar backup</button><button class="b" id="cClose">Fechar</button><button class="b p" id="cOk">Salvar</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SEED = [];
+const CATS={contas:'Contas',relatorio:'Relatório',helena:'Helena',pessoal:'Pessoal',ifto:'IFTO',fasec:'FASEC',doutorado:'Doutorado',feriado:'Feriado',aniversario:'Aniversário',outro:'Outro'};
+const RANK={contas:0,relatorio:0,helena:1,feriado:2,aniversario:2,pessoal:3,outro:4,ifto:5,fasec:6,doutorado:8};
+const AV={manha:'às 7h',vespera:'véspera 20h',m60:'1h antes',m15:'15 min antes',h0:'na hora'};
+const K='agenda.v1', $=s=>document.querySelector(s);
+const DIAS=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+let S=load();
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(K));if(s&&s.items)return s}catch(e){}
+  return {items:SEED.map(i=>({...i})),since:0,url:'',view:'dia'};
+}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const hoje=()=>iso(new Date());
+let cur=hoje(), mes=cur.slice(0,7), editing=null;
+
+function itensDo(data){
+  return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.hora||'99').localeCompare(b.hora||'99')||(a.ord||0)-(b.ord||0));
+}
+function itemHTML(i){
+  const hr=i.hora?(i.hora.replace(':','h')+(i.fim?'–'+i.fim.replace(':','h'):'')):'';
+  return `<div class="it${i.feito?' done':''}" style="--cc:var(--c-${i.cat})">
+    <button class="ck" data-ck="${i.id}" aria-label="Marcar como feito">${i.feito?'✓':''}</button>
+    <div class="tx" data-ed="${i.id}"><div class="ti">${esc(i.titulo)}</div>
+    <div class="me"><span class="tag">${CATS[i.cat]||'Outro'}</span>${hr?`<span>${hr}</span>`:''}${i.aviso?`<span>🔔 ${AV[i.aviso]}</span>`:''}${i.nota?`<span>📎 ${esc(i.nota)}</span>`:''}</div></div></div>`;
+}
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===S.view));
+  S.view==='mes'?renderMes():renderDia();
+}
+function renderDia(){
+  const d=parse(cur), its=itensDo(cur), f=its.filter(i=>i.feito).length, eh=cur===hoje();
+  $('#main').innerHTML=`<div class="nav"><button class="nb" data-go="-1" aria-label="Dia anterior">‹</button>
+    <div class="t">${eh?'Hoje':DIAS[d.getDay()]}<div class="sub">${eh?DIAS[d.getDay()]+', ':''}${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}</div></div>
+    ${eh?'':'<button class="pill" data-hoje>Hoje</button>'}<button class="nb" data-go="1" aria-label="Próximo dia">›</button></div>
+    ${its.length?`<div class="prog"><i style="width:${Math.round(f/its.length*100)}%"></i></div><div class="list">${its.map(itemHTML).join('')}</div>`
+    :(!S.url&&!S.items.length?'<div class="empty">Toque em <b>⚙︎</b> e cole o link de sincronização para carregar a sua agenda.</div>':'<div class="empty">Nada marcado para este dia.<br>Toque em <b>+</b> para incluir.</div>')}`;
+}
+function renderMes(){
+  const [y,m]=mes.split('-').map(Number), first=new Date(y,m-1,1), nd=new Date(y,m,0).getDate();
+  const off=(first.getDay()+6)%7, th=hoje();
+  let g='<div class="grid">'+['SEG','TER','QUA','QUI','SEX','SÁB','DOM'].map(w=>`<div class="wd">${w}</div>`).join('');
+  for(let k=0;k<off;k++) g+='<div class="cell out"></div>';
+  let lst='';
+  for(let d=1;d<=nd;d++){
+    const ds=`${y}-${pad(m)}-${pad(d)}`, its=itensDo(ds), fer=its.some(i=>i.cat==='feriado');
+    g+=`<button class="cell${ds===th?' today':''}${fer?' fer':''}" data-dia="${ds}"><span class="n">${d}</span>
+      <span class="dots">${its.map(i=>`<i class="${i.feito?'d':''}" style="--cc:var(--c-${i.cat})"></i>`).join('')}</span>
+      ${its.map(i=>`<span class="mt${i.feito?' d':''}" style="--cc:var(--c-${i.cat})">${i.hora?i.hora.replace(':','h')+' ':''}${esc(i.titulo)}</span>`).join('')}</button>`;
+    if(its.length){const dt=parse(ds);
+      lst+=`<div class="dayh${ds===th?' today':''}"><button data-dia="${ds}">${DIAS[dt.getDay()]}, ${d}</button><span class="c">${its.filter(i=>i.feito).length}/${its.length} feitos</span></div><div class="list">${its.map(itemHTML).join('')}</div>`;}
+  }
+  g+='</div>';
+  $('#main').innerHTML=`<div class="nav"><button class="nb" data-gm="-1" aria-label="Mês anterior">‹</button>
+    <div class="t">${MESES[m-1]} <span class="sub">${y}</span></div>
+    ${mes===th.slice(0,7)?'':'<button class="pill" data-mhoje>Este mês</button>'}<button class="nb" data-gm="1" aria-label="Próximo mês">›</button></div>
+    ${g}<div class="mlist">${lst||'<div class="empty">Nada marcado neste mês.</div>'}</div>`;
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-ck],[data-ed],[data-go],[data-hoje],[data-gm],[data-mhoje],[data-dia],.tab');
+  if(!t)return;
+  if(t.dataset.ck){const i=S.items.find(x=>x.id===t.dataset.ck);i.feito=!i.feito;touch(i);return}
+  if(t.dataset.ed){abrir(S.items.find(x=>x.id===t.dataset.ed));return}
+  if(t.dataset.go){const d=parse(cur);d.setDate(d.getDate()+ +t.dataset.go);cur=iso(d);render();return}
+  if('hoje' in t.dataset){cur=hoje();render();return}
+  if(t.dataset.gm){const[y,m]=mes.split('-').map(Number);const d=new Date(y,m-1+ +t.dataset.gm,1);mes=iso(d).slice(0,7);render();return}
+  if('mhoje' in t.dataset){mes=hoje().slice(0,7);render();return}
+  if(t.dataset.dia){cur=t.dataset.dia;S.view='dia';save();render();scrollTo(0,0);return}
+  if(t.classList.contains('tab')){S.view=t.dataset.v;if(S.view==='dia')cur=hoje();else mes=cur.slice(0,7);save();render();scrollTo(0,0)}
+});
+function touch(i){i.upd=Date.now();i._dirty=1;save();render();sync()}
+
+// ---- editor ----
+$('#fCat').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+function abrir(i){
+  editing=i||null;
+  $('#edT').textContent=i?'Editar':'Novo compromisso';
+  $('#fTit').value=i?i.titulo:''; $('#fData').value=i?i.data:cur; $('#fHora').value=i?i.hora:'';
+  $('#fCat').value=i?i.cat:'pessoal'; $('#fAv').value=i?i.aviso:'manha'; $('#fNota').value=i?i.nota:'';
+  $('#fRep').value=''; $('#fAte').value=''; $('#repBox').style.display=i?'none':''; $('#edDel').style.display=i?'':'none';
+  $('#shEd').classList.add('on'); if(!i)setTimeout(()=>$('#fTit').focus(),50);
+}
+const fechar=()=>document.querySelectorAll('.sh').forEach(s=>s.classList.remove('on'));
+$('#fab').onclick=()=>abrir(null); $('#edCan').onclick=fechar;
+document.querySelectorAll('.sh').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)fechar()}));
+$('#fHora').onchange=()=>{if($('#fHora').value&&$('#fAv').value==='manha')$('#fAv').value='m60'};
+$('#edOk').onclick=()=>{
+  const tit=$('#fTit').value.trim(), data=$('#fData').value; if(!tit||!data){toast('Preencha o que é e o dia');return}
+  const base={titulo:tit,data,hora:$('#fHora').value,cat:$('#fCat').value,aviso:$('#fAv').value,nota:$('#fNota').value.trim()};
+  if(editing){if(editing.hora!==base.hora)editing.fim='';Object.assign(editing,base);editing.upd=Date.now();editing._dirty=1}
+  else{
+    const datas=[data],rep=$('#fRep').value,ate=$('#fAte').value;
+    if(rep&&ate){const d=parse(data),d0=d.getDate();for(let n=1;n<120;n++){
+      const x=rep==='w'?new Date(d.getFullYear(),d.getMonth(),d.getDate()+7*n):new Date(d.getFullYear(),d.getMonth()+n,Math.min(d0,new Date(d.getFullYear(),d.getMonth()+n+1,0).getDate()));
+      const s=iso(x);if(s>ate)break;datas.push(s)}}
+    const g=Date.now().toString(36);
+    datas.forEach((ds,k)=>S.items.push({id:'u'+g+Math.random().toString(36).slice(2,6)+k,...base,data:ds,fim:'',feito:false,ord:99,upd:Date.now(),del:false,_dirty:1}));
+    if(datas.length>1)toast(datas.length+' datas incluídas');
+  }
+  fechar();cur=data;save();render();sync();
+};
+$('#edDel').onclick=()=>{if(!editing||!confirm('Excluir "'+editing.titulo+'"?'))return;editing.del=true;editing.upd=Date.now();editing._dirty=1;fechar();save();render();sync()};
+
+// ---- configurações ----
+function icsUrl(){return S.url?S.url+(S.url.includes('?')?'&':'?')+'a=ics':''}
+$('#bcfg').onclick=()=>{$('#cUrl').value=S.url||'';$('#cIcs').value=icsUrl()||'(aparece depois de colar o link de sincronização)';$('#shCfg').classList.add('on')};
+$('#cClose').onclick=fechar;
+$('#cOk').onclick=()=>{const u=$('#cUrl').value.trim();if(u&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){toast('Esse não parece o link do Apps Script');return}
+  if(u!==S.url){S.url=u;S.since=0;S.items.forEach(i=>i._dirty=1)}save();fechar();sync(true)};
+$('#cCopy').onclick=async()=>{const v=icsUrl();if(!v)return;try{await navigator.clipboard.writeText(v);toast('Link copiado')}catch(e){$('#cIcs').select();document.execCommand('copy');toast('Link copiado')}};
+$('#cExp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S.items.filter(i=>!i.del),null,1)],{type:'application/json'}));a.download='agenda-backup-'+hoje()+'.json';a.click()};
+
+// ---- sincronização ----
+let syncing=false;
+function status(){
+  const pend=S.items.some(i=>i._dirty);
+  $('#sdot').className='dot'+(!S.url?'':(!navigator.onLine||pend?' pend':' ok'));
+  $('#stx').textContent=!S.url?'só neste aparelho':!navigator.onLine?'off-line · salvo':pend?'a enviar':'sincronizado';
+}
+async function sync(manual){
+  status(); if(!S.url||!navigator.onLine||syncing){if(manual&&!S.url)toast('Cole o link de sincronização em ⚙︎');return}
+  syncing=true; $('#bsync').style.opacity=.5;
+  try{
+    const ch=S.items.filter(i=>i._dirty).map(({_dirty,...r})=>r);
+    const r=await fetch(S.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'sync',since:S.since,changes:ch})});
+    const j=await r.json(); if(j.erro)throw new Error(j.erro);
+    const sent=new Map(ch.map(c=>[c.id,c.upd]));
+    S.items.forEach(i=>{if(i._dirty&&sent.has(i.id)&&sent.get(i.id)>=i.upd)delete i._dirty});
+    const map=new Map(S.items.map(i=>[i.id,i]));
+    for(const it of j.items){const l=map.get(it.id);
+      if(!l){S.items.push(it);map.set(it.id,it)} else if(!l._dirty||it.upd>=l.upd){Object.keys(l).forEach(k=>delete l[k]);Object.assign(l,it)}}
+    S.since=j.now; save(); render(); if(manual)toast('Sincronizado');
+  }catch(e){if(manual)toast('Não deu para sincronizar agora')}
+  finally{syncing=false;$('#bsync').style.opacity=1;status()}
+}
+$('#bsync').onclick=()=>sync(true);
+addEventListener('online',()=>sync()); addEventListener('offline',status);
+let ultHoje=hoje();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const h=hoje();if(h!==ultHoje){if(cur===ultHoje)cur=h;ultHoje=h}render();sync()}});
+setInterval(()=>sync(),5*60*1000);
+
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+render(); sync();
+</script>
+</body>
+</html>
