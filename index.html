@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Agenda</title>
-<meta name="theme-color" content="#0b1d4a">
+<meta name="theme-color" content="#dfe8fb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Agenda">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -22,18 +22,10 @@
        radial-gradient(900px 600px at 100% 100%,rgba(255,255,255,.7),transparent 60%),
        linear-gradient(160deg,#e4edfc 0%,#cddcf6 45%,#dfe8fb 100%);
 }
-@media (max-width:599px){:root{
-  --ink:#fff;--mut:rgba(220,230,255,.72);--line:rgba(255,255,255,.16);
-  --glass:rgba(255,255,255,.08);--glass2:rgba(255,255,255,.13);--shadow:0 10px 30px rgba(0,0,0,.25);
-  --today:rgba(61,139,255,.28);--todayb:#3d8bff;
-  --bg:radial-gradient(700px 500px at 110% 70%,rgba(140,110,255,.35),transparent 60%),
-       radial-gradient(600px 400px at -20% 100%,rgba(60,120,255,.35),transparent 60%),
-       linear-gradient(170deg,#0a1a44 0%,#0f2f78 50%,#1e4aa8 100%);
-}}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Inter,sans-serif}
 body{background:var(--bg) fixed;background-color:#dfe8fb}
-@media (max-width:599px){body{background-color:#0f2f78}}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 svg{display:block}
 .glass{background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
@@ -105,19 +97,18 @@ main{max-width:1200px;margin:0 auto;padding:8px 16px calc(env(safe-area-inset-bo
   .mpill .nb{width:38px;height:38px;box-shadow:none}
   .grid{gap:5px}.wd{font-size:12px}
   .cell{min-height:96px;padding:5px 4px;border-radius:12px;gap:2px}
-  .cell .n{font-size:16px}.cell.today{background:var(--today);box-shadow:0 0 18px rgba(61,139,255,.6)}.cell.today .n::after{display:none}
+  .cell .n{font-size:16px}.cell.today .n::after{display:none}
   .ch{font-size:10px;line-height:1.2;overflow-wrap:anywhere;hyphens:auto;padding:1px 1px 1px 5px;background:none;border-radius:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .ch::before{top:1px;bottom:1px}
-  .more{font-size:11px;padding-left:6px;color:#fff}
+  .more{font-size:11px;padding-left:6px}
   .ti{font-size:17px}.nav .t b{font-size:26px}
-  .it{background:linear-gradient(100deg,rgba(255,255,255,.18),rgba(255,255,255,.08))}
 }
 /* barra de baixo */
 .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:6;display:flex;gap:6px;padding:6px;border-radius:999px}
 .tab{display:flex;align-items:center;gap:10px;padding:12px 34px;border-radius:999px;font-weight:700;font-size:17px;color:var(--mut)}
 .tab.on{background:linear-gradient(160deg,#4a93ff,var(--blue2));color:#fff;box-shadow:0 8px 20px rgba(31,98,230,.4)}
 @media (max-width:599px){.tabs{left:16px;right:16px;transform:none;justify-content:space-around}
-  .tab{flex:1;flex-direction:column;gap:4px;padding:10px;font-size:15px;border-radius:999px;color:#fff;justify-content:center}}
+  .tab{flex:1;flex-direction:column;gap:4px;padding:10px;font-size:15px;border-radius:999px;justify-content:center}}
 .fab{position:fixed;right:22px;bottom:calc(env(safe-area-inset-bottom) + 96px);z-index:7;width:66px;height:66px;border-radius:50%;
      background:radial-gradient(circle at 35% 30%,#6aa8ff,#1f62e6 70%);color:#fff;display:grid;place-items:center;
      box-shadow:0 10px 26px rgba(31,98,230,.5),0 0 0 4px rgba(255,255,255,.35)}
@@ -126,12 +117,10 @@ main{max-width:1200px;margin:0 auto;padding:8px 16px calc(env(safe-area-inset-bo
 .sh{position:fixed;inset:0;z-index:20;background:rgba(10,20,50,.35);display:none;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .sh.on{display:flex}
 .pane{width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px 18px calc(env(safe-area-inset-bottom) + 20px);max-height:92vh;overflow:auto;background:rgba(255,255,255,.9);color:#0d1b3e;-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
-@media (max-width:599px){.pane{background:rgba(16,36,90,.94);color:#fff}}
 @media (min-width:700px){.sh{align-items:center}.pane{border-radius:24px}}
 .pane h2{margin:0 0 12px;font-size:20px}
 label{display:block;font-size:12px;font-weight:700;opacity:.7;margin:12px 0 5px}
 input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border-radius:12px;border:1px solid rgba(120,140,180,.35);background:rgba(255,255,255,.6);color:inherit}
-@media (max-width:599px){input,select,textarea{background:rgba(255,255,255,.1)}select option{color:#000}}
 textarea{min-height:64px;resize:vertical}
 .row{display:flex;gap:10px}.row>div{flex:1}
 .btns{display:flex;gap:10px;margin-top:18px}
@@ -226,7 +215,7 @@ if(S.view!=='mes')S.view='dia';
 // fim do compromisso com horário (sem término informado = 1 hora depois)
 function fimMs(i){if(!/^\d\d:\d\d$/.test(i.hora||''))return null;const[y,m,d]=i.data.split('-').map(Number);
   const[h,mi]=i.hora.split(':').map(Number);let e=new Date(y,m-1,d,h,mi).getTime()+3600000;
-  if(/^\d\d:\d\d$/.test(i.fim||'')){const[fh,fm]=i.fim.split(':').map(Number);const f=new Date(y,m-1,d,fh,fm).getTime();if(f>e-3600000)e=f}return e}
+  if(/^\d\d:\d\d$/.test(i.fim||'')){const[fh,fm]=i.fim.split(':').map(Number);let f=new Date(y,m-1,d,fh,fm).getTime();if(i.fim<=i.hora)f+=86400000;e=f}return e}
 // risca sozinho o que tinha horário e já terminou (se ninguém mexeu nele depois)
 function autoRisca(){const agora=Date.now();let n=0;
   S.items.forEach(i=>{if(i.del||i.feito)return;const f=fimMs(i);if(f&&f<=agora&&(i.upd||0)<f){i.feito=true;i.upd=agora;i._dirty=1;n++}});
@@ -235,7 +224,7 @@ function autoRisca(){const agora=Date.now();let n=0;
 function itensDo(data){return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99')||(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.ord||0)-(b.ord||0))}
 function avisoTxt(i){return i.hora?'00h · 1h e 30 min antes':'00h'}
 function itemHTML(i){
-  const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim):''):'';
+  const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim)+(i.fim<=i.hora?' (dia seguinte)':''):''):'';
   const auto=i.feito&&f&&Date.now()>=f;
   return `<div class="it glass${i.feito?' done':''}" style="--cc:var(--c-${i.cat})">
   <button class="ck" data-ck="${i.id}" aria-label="Marcar como feito">${i.feito?'✓':''}</button>
@@ -287,6 +276,8 @@ function touch(i){i.upd=Date.now();i._dirty=1;save();render();sync()}
 $('#fCat').innerHTML=Object.entries(CATS).filter(([k])=>k!=='fasec'&&k!=='ifto').map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
 const notaAv=()=>{$('#fAvNote').textContent=$('#fHora').value?'Avisos: 00h do dia, 1h antes e 30 min antes. Some da lista sozinho quando terminar.':'Aviso às 00h do dia. Fica o dia todo até você riscar.'};
 $('#fHora').oninput=notaAv;
+const PADRAO=[[/helena dorme/i,'19:00','12:00'],[/buscar helena/i,'14:00','18:00'],[/pagar fomento|relat[óo]rio da uab|pens[ãa]o/i,'12:00','13:00']];
+$('#fTit').addEventListener('change',()=>{if($('#fHora').value)return;const p=PADRAO.find(([r])=>r.test($('#fTit').value));if(p){$('#fHora').value=p[1];$('#fFim').value=p[2];if(/helena/i.test($('#fTit').value))$('#fCat').value='helena';notaAv()}});
 function abrir(i){editing=i||null;$('#edT').textContent=i?'Editar':'Novo compromisso';
   $('#fTit').value=i?i.titulo:'';$('#fData').value=i?i.data:cur;$('#fHora').value=i?i.hora:'';$('#fFim').value=i?i.fim:'';
   $('#fCat').value=i&&CATS[i.cat]?i.cat:'pessoal';$('#fNota').value=i?i.nota:'';$('#fRep').value='';$('#fAte').value='';
