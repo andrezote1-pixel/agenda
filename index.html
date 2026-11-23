@@ -115,8 +115,8 @@ textarea{min-height:64px;resize:vertical}
 
 <div class="sh" id="shCfg"><div class="pane">
   <h2>Configurações</h2>
-  <button class="b p" id="cCal" style="width:100%">🔔 Ligar avisos no Calendário (iPhone)</button>
-  <div class="note">Use só no iPhone. Na tela que abrir, deixe “Remover Alertas” desligado.</div>
+  <button class="b p" id="cCal" style="width:100%">🔔 Receber no Calendário (iPhone/iPad)</button>
+  <div class="note">Na tela que abrir, deixe “Remover Alertas” desligado.</div>
   <button class="b" id="cGcal" style="width:100%;margin-top:10px">Ver no Google Agenda (computador)</button>
   <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Avançado</summary>
   <label>Link de sincronização (do Apps Script)</label>
@@ -146,22 +146,17 @@ const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='Mac
 const SOLO=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 (()=>{const m=location.hash.match(/k=([0-9a-f]{16,64})/);if(!m)return;const u=API+'?t='+m[1];
   if(S.url!==u){S.url=u;S.since=0;S.items=S.items.filter(i=>i._dirty);save()}
-  if(!IOS)history.replaceState(null,'',location.pathname);})();
+})();
 if(!IOS){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l)}
 const webcal=()=>S.url?S.url.replace(/^https:/,'webcal:')+'&a=ics':'';
-let instalar=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();instalar=e;guia()});
-addEventListener('appinstalled',()=>{instalar=null;S.inst=1;save();guia()});
 function guia(){
   const g=document.getElementById('guia');let h='';
-  if(!S.url) h='';
-  else if(IOS&&!SOLO) h=`<div class="gb"><div class="gt"><b>Instale no seu ${/iPad/.test(navigator.userAgent)||navigator.maxTouchPoints>1&&!/iPhone/.test(navigator.userAgent)?'iPad':'iPhone'}</b>Toque em <b style="display:inline">Compartilhar ⬆︎</b> aqui embaixo e depois em <b style="display:inline">Adicionar à Tela de Início</b>.</div></div>`;
-  else if(IOS&&SOLO&&!S.cal&&/iPhone/.test(navigator.userAgent)) h=`<div class="gb"><div class="gt"><b>Ligar os avisos</b>Um toque e os lembretes passam a tocar pelo Calendário do iPhone.</div><button class="go" id="gCal">Ligar</button><button class="gx" id="gX" aria-label="Agora não">✕</button></div>`;
-  else if(!IOS&&instalar&&!S.inst) h=`<div class="gb"><div class="gt"><b>Instalar no computador</b>Abre como um programa, sem precisar do navegador.</div><button class="go" id="gIns">Instalar</button></div>`;
+  if(S.url&&IOS&&!S.cal) h=`<div class="gb"><div class="gt"><b>Receber no Calendário</b>Um toque e os compromissos aparecem no Calendário deste aparelho, com aviso.</div><button class="go" id="gCal">Ligar</button><button class="gx" id="gX" aria-label="Agora não">✕</button></div>`;
   g.innerHTML=h;
-  const c=document.getElementById('gCal');if(c)c.onclick=()=>{S.cal=1;save();location.href=webcal();setTimeout(()=>{guia();toast('Na tela do Calendário, deixe “Remover Alertas” desligado e toque em Adicionar')},800)};
+  const c=document.getElementById('gCal');if(c)c.onclick=()=>{S.cal=1;save();location.href=webcal();setTimeout(()=>{guia();toast('Deixe “Remover Alertas” desligado e toque em Adicionar')},800)};
   const x=document.getElementById('gX');if(x)x.onclick=()=>{S.cal=1;save();guia()};
-  const i=document.getElementById('gIns');if(i)i.onclick=async()=>{instalar.prompt();await instalar.userChoice;instalar=null;guia()};
 }
+
 function load(){
   try{const s=JSON.parse(localStorage.getItem(K));if(s&&s.items)return s}catch(e){}
   return {items:SEED.map(i=>({...i})),since:0,url:'',view:'dia'};
@@ -233,7 +228,7 @@ document.addEventListener('click',e=>{
 function touch(i){i.upd=Date.now();i._dirty=1;save();render();sync()}
 
 // ---- editor ----
-$('#fCat').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+$('#fCat').innerHTML=Object.entries(CATS).filter(([k])=>k!=='fasec'&&k!=='ifto').map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
 function abrir(i){
   editing=i||null;
   $('#edT').textContent=i?'Editar':'Novo compromisso';
