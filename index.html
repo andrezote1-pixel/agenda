@@ -242,7 +242,8 @@ function renderDia(){
   ${its.length?`<div class="prog"><i style="width:${Math.round(f/its.length*100)}%"></i></div><div class="list">${its.map(itemHTML).join('')}</div>`
   :(!S.url&&!S.items.length?'<div class="empty glass">Abra o seu link de acesso uma vez neste aparelho para carregar a agenda.</div>':'<div class="empty glass">Nada marcado para este dia.<br>Toque em <b>+</b> para incluir.</div>')}`}
 // dias que já passaram há mais de 7 dias somem da agenda
-function corte(){const d=new Date();d.setDate(d.getDate()-7);return iso(d)}
+// no celular some o que passou há mais de 3 dias; no computador e iPad, 7 dias
+function corte(){const d=new Date();d.setDate(d.getDate()-(PHONE()?3:7));return iso(d)}
 function renderMes(){
   const[y,m]=mes.split('-').map(Number),first=new Date(y,m-1,1),nd=new Date(y,m,0).getDate(),off=(first.getDay()+6)%7,th=hoje(),ph=PHONE(),lim=ph?2:4,ct=corte();
   if(mes<ct.slice(0,7)){mes=ct.slice(0,7);return renderMes()}
