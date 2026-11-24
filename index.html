@@ -9,8 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Agenda">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<link rel="icon" href="favicon.png">
 <style>
 :root{
   --ink:#0d1b3e;--mut:#5b6b8c;--line:rgba(255,255,255,.75);
@@ -32,7 +32,7 @@ svg{display:block}
 /* topo */
 header{position:sticky;top:0;z-index:5;padding:calc(env(safe-area-inset-top) + 12px) 16px 6px}
 .top{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px;border-radius:26px}
-.appic{width:40px;height:40px;border-radius:12px;background:linear-gradient(160deg,#5aa2ff,#1f62e6);display:grid;place-items:center;box-shadow:0 6px 14px rgba(31,98,230,.35);flex:none}
+.appic{width:44px;height:44px;flex:none;display:block;filter:drop-shadow(0 4px 8px rgba(31,98,230,.25))}
 .top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:.2px;flex:1}
 .sync{display:flex;align-items:center;gap:7px;font-size:13px;padding:7px 12px;border-radius:999px;background:var(--glass2);border:1px solid var(--line)}
 .dot{width:9px;height:9px;border-radius:50%;background:#9aa6bf}.dot.ok{background:#22c55e}.dot.pend{background:#f5b301}
@@ -138,7 +138,7 @@ textarea{min-height:64px;resize:vertical}
 <body>
 <header>
   <div class="top glass">
-    <div class="appic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01" stroke-width="2.6"/></svg></div>
+    <img class="appic" src="logo.png" alt="">
     <h1>Agenda</h1>
     <div class="sync"><span class="dot" id="sdot"></span><span id="stx">no aparelho</span></div>
     <button class="ib" id="bfind" aria-label="Buscar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
