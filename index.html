@@ -123,7 +123,11 @@ main{max-width:1200px;margin:0 auto;padding:8px 16px calc(env(safe-area-inset-bo
 label{display:block;font-size:12px;font-weight:700;opacity:.7;margin:12px 0 5px}
 input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border-radius:12px;border:1px solid rgba(120,140,180,.35);background:rgba(255,255,255,.6);color:inherit}
 textarea{min-height:64px;resize:vertical}
-.row{display:flex;gap:10px}.row>div{flex:1}
+.row{display:flex;gap:10px}.row>div{flex:1 1 0;min-width:0}
+input,select,textarea{min-width:0;max-width:100%;display:block}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;height:48px;line-height:24px;text-align:left}
+input::-webkit-date-and-time-value{text-align:left;margin:0}
+select{height:48px}
 .btns{display:flex;gap:10px;margin-top:18px}
 .b{flex:1;padding:13px;border-radius:14px;font-weight:700;background:rgba(120,140,180,.15)}
 .b.p{background:linear-gradient(160deg,#4a93ff,var(--blue2));color:#fff}.b.x{color:#e5484d}
