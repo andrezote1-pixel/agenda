@@ -135,6 +135,7 @@ select{height:48px}
 .res{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .res button{text-align:left;padding:10px 12px;border-radius:12px;background:rgba(120,140,180,.12)}
 .res small{display:block;opacity:.7}
+.sr{padding:12px 14px;border-radius:16px;margin-top:10px}.sr .ti{font-weight:700}.sr .btns{margin-top:10px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 170px);background:#0d1b3e;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:.95}
 </style>
@@ -182,12 +183,19 @@ select{height:48px}
   <h2>Configurações</h2>
   <button class="b p" id="cCal" style="width:100%">🔔 Receber no Calendário (iPhone/iPad)</button>
   <div class="note">Na tela que abrir, deixe “Remover Alertas” desligado e escolha a conta iCloud.</div>
+  <button class="b" id="cNot" style="width:100%;margin-top:10px">📲 Ativar notificações do app</button>
   <button class="b" id="cGcal" style="width:100%;margin-top:10px">Ver no Google Agenda</button>
   <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Avançado</summary>
   <label>Link de sincronização</label>
   <input id="cUrl" placeholder="https://script.google.com/macros/s/…/exec?t=…">
   </details>
   <div class="btns"><button class="b" id="cExp">Baixar backup</button><button class="b" id="cClose">Fechar</button><button class="b p" id="cOk">Salvar</button></div>
+</div></div>
+<div class="sh" id="shSerie"><div class="pane">
+  <h2>📺 Já assistiu?</h2>
+  <div class="note">O que você ainda não viu passa para amanhã e eu pergunto de novo.</div>
+  <div id="srList"></div>
+  <div class="btns"><button class="b" id="srClose">Depois</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -223,21 +231,37 @@ function fimMs(i){if(!/^\d\d:\d\d$/.test(i.hora||''))return null;const[y,m,d]=i.
   if(/^\d\d:\d\d$/.test(i.fim||'')){const[fh,fm]=i.fim.split(':').map(Number);let f=new Date(y,m-1,d,fh,fm).getTime();if(i.fim<=i.hora)f+=86400000;e=f}return e}
 // risca sozinho o que tinha horário e já terminou (se ninguém mexeu nele depois)
 function autoRisca(){const agora=Date.now();let n=0;
-  S.items.forEach(i=>{if(i.del||i.feito)return;const f=fimMs(i);if(f&&f<=agora&&(i.upd||0)<f){i.feito=true;i.upd=agora;i._dirty=1;n++}});
+  S.items.forEach(i=>{if(i.del||i.feito||i.cat==='serie')return;const f=fimMs(i);if(f&&f<=agora&&(i.upd||0)<f){i.feito=true;i.upd=agora;i._dirty=1;n++}});
   if(n){save();sync()}}
 
+// séries: episódio não assistido passa para o dia seguinte e o app pergunta se você viu
+const SERIE=i=>i.cat==='serie',ROLOU=i=>/^Estreou em/.test(i.nota||'');
+function rolaSeries(){const h=hoje(),agora=Date.now();let n=0;
+  S.items.forEach(i=>{if(i.del||i.feito||!SERIE(i)||i.data>=h)return;
+    if(!ROLOU(i)){const d=parse(i.data);i.nota='Estreou em '+pad(d.getDate())+'/'+pad(d.getMonth()+1)+(i.nota?' · '+i.nota:'')}
+    i.data=h;i.upd=agora;i._dirty=1;n++});
+  if(n){save();sync()}}
+function pendSeries(){const h=hoje(),t=new Date(),hm=pad(t.getHours())+':'+pad(t.getMinutes());let P={};try{P=JSON.parse(localStorage.getItem('agenda.perg'))||{}}catch(e){}
+  return S.items.filter(i=>!i.del&&!i.feito&&SERIE(i)&&i.data===h&&(ROLOU(i)||!i.hora||i.hora<=hm)&&P[i.id]!==h)}
+function perguntaSeries(){if($('.sh.on'))return;const p=pendSeries();if(!p.length)return;
+  $('#srList').innerHTML=p.map(i=>`<div class="sr glass"><div class="ti">${esc(i.titulo)}</div>${ROLOU(i)?`<div class="note">${esc(i.nota.split(' · ')[0])} · ainda não marcado</div>`:''}
+  <div class="btns"><button class="b" data-nao="${i.id}">Ainda não</button><button class="b p" data-vi="${i.id}">Já vi ✓</button></div></div>`).join('');
+  $('#shSerie').classList.add('on');notifica(p)}
+function marcaPerg(id){let P={};try{P=JSON.parse(localStorage.getItem('agenda.perg'))||{}}catch(e){}P[id]=hoje();try{localStorage.setItem('agenda.perg',JSON.stringify(P))}catch(e){}}
+function notifica(p){try{if(!('Notification' in window)||Notification.permission!=='granted'||!navigator.serviceWorker)return;
+  navigator.serviceWorker.ready.then(r=>p.forEach(i=>r.showNotification('Já assistiu?',{body:i.titulo.replace(/^📺 /,'')+' — se não, fica para amanhã',tag:'perg-'+i.id+'-'+hoje(),icon:'icon-192.png'})))}catch(e){}}
 function itensDo(data){return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99')||(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.ord||0)-(b.ord||0))}
 const AULA=i=>i.cat==='fasec'||i.cat==='ifto';
-function avisoTxt(i){return AULA(i)?'':i.cat==='serie'&&i.hora?'na hora ('+i.hora.replace(':00','h')+')':i.hora?'00h · 1h e 30 min antes':'00h'}
+function avisoTxt(i){return AULA(i)?'':SERIE(i)?(ROLOU(i)?'pergunta se você viu':'08h, na estreia'):i.hora?'00h · 1h e 30 min antes':'00h'}
 function itemHTML(i){
   const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim)+(i.fim<=i.hora?' (dia seguinte)':''):''):'';
-  const auto=i.feito&&f&&Date.now()>=f;
+  const auto=i.feito&&f&&Date.now()>=f&&!SERIE(i);
   return `<div class="it glass${i.feito?' done':''}" style="--cc:var(--c-${i.cat})">
   <button class="ck" data-ck="${i.id}" aria-label="Marcar como feito">${i.feito?'✓':''}</button>
   <div class="tx" data-ed="${i.id}"><div class="ti">${esc(i.titulo)}</div>
   <div class="me"><span class="tag">${CATS[i.cat]||'Outro'}</span>${hr?`<span>🕒 ${hr}</span>`:''}${i.feito?(auto?'<span class="auto">encerrado</span>':''):(avisoTxt(i)?`<span>🔔 ${avisoTxt(i)}</span>`:'')}${i.nota?`<span>📎 ${esc(i.nota)}</span>`:''}</div></div></div>`}
 
-function render(){autoRisca();document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===S.view));S.view==='mes'?renderMes():renderDia()}
+function render(){rolaSeries();autoRisca();document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===S.view));S.view==='mes'?renderMes():renderDia()}
 function renderDia(){
   const d=parse(cur),its=itensDo(cur),f=its.filter(i=>i.feito).length,eh=cur===hoje();
   $('#main').innerHTML=`<div class="nav"><button class="nb" data-go="-1" aria-label="Dia anterior"${cur<=corte()?' disabled':''}>${seta(-1)}</button>
@@ -357,10 +381,17 @@ async function sync(manual){status();if(!S.url||!navigator.onLine||syncing){if(m
   catch(e){if(manual)toast('Não deu para sincronizar agora')}
   finally{syncing=false;$('#bsync').style.opacity=1;status()}}
 $('#bsync').onclick=()=>sync(true);
+$('#srList').onclick=e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.vi||b.dataset.nao,i=S.items.find(x=>x.id===id);if(!i)return;
+  if(b.dataset.vi){i.feito=true;i.upd=Date.now();i._dirty=1;save();sync()}else toast('Fica para amanhã');
+  marcaPerg(id);b.closest('.sr').remove();if(!$('#srList').children.length)fechar();render()};
+$('#srClose').onclick=()=>{fechar()};
+$('#cNot').onclick=async()=>{if(!('Notification' in window)){toast(IOS?'No iPhone, abra o app pelo ícone da tela de início':'Este navegador não tem notificações');return}
+  const r=await Notification.requestPermission();toast(r==='granted'?'Notificações ligadas':'Notificações não autorizadas')};
 addEventListener('online',()=>sync());addEventListener('offline',status);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){const h=hoje();if(h!==ultHoje){if(cur===ultHoje)cur=h;ultHoje=h}render();sync()}});
 setInterval(()=>{const h=hoje();if(h!==ultHoje){if(cur===ultHoje)cur=h;ultHoje=h}render()},60*1000);
 setInterval(()=>sync(),5*60*1000);
+setInterval(perguntaSeries,60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(perguntaSeries,1500)});
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)}
 addEventListener('resize',()=>{if(S.view==='mes')render()});
 if('serviceWorker' in navigator&&location.protocol!=='file:'){
@@ -369,7 +400,7 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(tinha&&!recarregou){recarregou=true;location.reload()}});
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()});setInterval(()=>r.update(),30*60*1000)}).catch(()=>{});
 }
-render();guia();sync();
+render();guia();sync();setTimeout(perguntaSeries,1500);
 </script>
 </body>
 </html>
