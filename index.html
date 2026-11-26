@@ -17,7 +17,7 @@
   --glass:rgba(255,255,255,.52);--glass2:rgba(255,255,255,.72);--shadow:0 10px 30px rgba(36,76,160,.12);
   --blue:#2f7cf6;--blue2:#1a5ee0;--today:#fff1bf;--todayb:#f3c63f;
   --c-contas:#f0a500;--c-relatorio:#e8761a;--c-helena:#e64a9a;--c-pessoal:#2f7cf6;--c-doutorado:#8a5cf6;
-  --c-feriado:#e5484d;--c-aniversario:#c22a2a;--c-outro:#7a879f;--c-fasec:#1a8bbd;--c-ifto:#2f9e41;
+  --c-feriado:#e5484d;--c-aniversario:#c22a2a;--c-outro:#7a879f;--c-fasec:#1a8bbd;--c-ifto:#2f9e41;--c-serie:#9b51e0;
   --bg:radial-gradient(1200px 500px at 10% 0%,rgba(255,255,255,.9),transparent 60%),
        radial-gradient(900px 600px at 100% 100%,rgba(255,255,255,.7),transparent 60%),
        linear-gradient(160deg,#e4edfc 0%,#cddcf6 45%,#dfe8fb 100%);
@@ -193,8 +193,8 @@ select{height:48px}
 
 <script>
 const SEED=[];
-const CATS={pessoal:'Pessoal',helena:'Helena',contas:'Contas',relatorio:'Relatório',doutorado:'Doutorado',aniversario:'Aniversário',feriado:'Feriado',outro:'Outro',fasec:'FASEC',ifto:'IFTO'};
-const RANK={contas:0,relatorio:0,helena:1,feriado:2,aniversario:2,pessoal:3,outro:4,ifto:5,fasec:6,doutorado:8};
+const CATS={pessoal:'Pessoal',helena:'Helena',contas:'Contas',relatorio:'Relatório',doutorado:'Doutorado',aniversario:'Aniversário',feriado:'Feriado',outro:'Outro',fasec:'FASEC',ifto:'IFTO',serie:'Séries'};
+const RANK={contas:0,relatorio:0,helena:1,feriado:2,aniversario:2,pessoal:3,outro:4,ifto:5,fasec:6,doutorado:8,serie:7};
 const API='https://script.google.com/macros/s/AKfycbxDIY9vPhPzJIOH6i_to3iMhn4ym3ULJP_3UwZd1XK0kCUJ9enu-VH2Bo5Ym6qVpg47/exec';
 const K='agenda.v1',$=s=>document.querySelector(s);
 const DIAS=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
@@ -228,7 +228,7 @@ function autoRisca(){const agora=Date.now();let n=0;
 
 function itensDo(data){return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99')||(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.ord||0)-(b.ord||0))}
 const AULA=i=>i.cat==='fasec'||i.cat==='ifto';
-function avisoTxt(i){return AULA(i)?'':i.hora?'00h · 1h e 30 min antes':'00h'}
+function avisoTxt(i){return AULA(i)?'':i.cat==='serie'&&i.hora?'na hora ('+i.hora.replace(':00','h')+')':i.hora?'00h · 1h e 30 min antes':'00h'}
 function itemHTML(i){
   const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim)+(i.fim<=i.hora?' (dia seguinte)':''):''):'';
   const auto=i.feito&&f&&Date.now()>=f;
