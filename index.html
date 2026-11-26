@@ -252,7 +252,7 @@ function notifica(p){try{if(!('Notification' in window)||Notification.permission
   navigator.serviceWorker.ready.then(r=>p.forEach(i=>r.showNotification('Já assistiu?',{body:i.titulo.replace(/^📺 /,'')+' — se não, fica para amanhã',tag:'perg-'+i.id+'-'+hoje(),icon:'icon-192.png'})))}catch(e){}}
 function itensDo(data){return S.items.filter(i=>!i.del&&i.data===data).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99')||(RANK[a.cat]??4)-(RANK[b.cat]??4)||(a.ord||0)-(b.ord||0))}
 const AULA=i=>i.cat==='fasec'||i.cat==='ifto';
-function avisoTxt(i){return AULA(i)?'':SERIE(i)?(ROLOU(i)?'pergunta se você viu':'08h, na estreia'):i.hora?'00h · 1h e 30 min antes':'00h'}
+function avisoTxt(i){return AULA(i)?'':SERIE(i)?(ROLOU(i)?'pergunta se você viu':i.hora?hh(i.hora)+', na estreia':'na estreia'):i.hora?'00h · 1h e 30 min antes':'00h'}
 function itemHTML(i){
   const f=fimMs(i),hr=i.hora?hh(i.hora)+(i.fim?' – '+hh(i.fim)+(i.fim<=i.hora?' (dia seguinte)':''):''):'';
   const auto=i.feito&&f&&Date.now()>=f&&!SERIE(i);
